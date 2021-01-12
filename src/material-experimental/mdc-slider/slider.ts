@@ -215,8 +215,8 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, OnD
   getRootEl() {
     return this._elementRef.nativeElement;
   }
-  getValue(thumb: Thumb): number {
-    return this.getInput(thumb).value;
+  getValue(thumb: Thumb = Thumb.END): number {
+    return coerceNumberProperty(this.getInput(thumb).value);
   }
   setValue(value: number, thumb: Thumb) {
     if (thumb === Thumb.START) {
@@ -271,13 +271,41 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, OnD
   private _createEvent(value: number, thumb: Thumb): MatSliderEvent {
     return new MatSliderEvent(this, this.getInput(thumb), value);
   }
+  private _half(min: number, max: number) {
+    return min + (max - min) / 2;
+  }
+
+  /**
+   * Initialize the inputs by telling them what thumbs they
+   * correspond to and informing them of their default values.
+   */
   private _initInputs() {
-    // Indicate to each of the inputs what thumb they correspond to.
+    const middle = this._half(this.min, this.max);
+
     if (this.isRange) {
-      this.inputs[0].thumb = Thumb.START;
-      this.inputs[1].thumb = Thumb.END;
+      const startInput = this.getInput(Thumb.START);
+      const endInput = this.getInput(Thumb.END);
+
+      const startValue = endInput.initialized
+        ? this._half(this.min, coerceNumberProperty(endInput.value))
+        : this._half(this.min, middle);
+      const endValue = startInput.initialized
+        ? this._half(coerceNumberProperty(startInput.value), middle)
+        : this._half(middle, this.max);
+
+      startInput.init({
+        thumb: Thumb.START,
+        value: startValue,
+      });
+      endInput.init({
+        thumb: Thumb.END,
+        value: endValue,
+      });
     } else {
-      this.inputs[0].thumb = Thumb.END;
+      this.getInput().init({
+        thumb: Thumb.END,
+        value: middle,
+      })
     }
     // Disable the slider inputs if this slider is disabled.
     if (this.isDisabled) {
@@ -295,8 +323,8 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, OnD
   }
 
   ngAfterViewInit() {
-    this.initialized = true;
     this._initInputs();
+    this.initialized = true;
     this._foundation.init();
     if (this._platform.isBrowser) {
       this._foundation.layout();
@@ -362,7 +390,7 @@ class SliderAdapter implements MDCSliderAdapter {
     return this._delegate.getInputEl(thumb).value;
   }
   setInputValue = (value: string, thumb: Thumb): void => {
-    this._delegate.getInput(thumb).value = coerceNumberProperty(value);
+    this._delegate.getInput(thumb).value = value;
   }
   getInputAttribute = (attribute: string, thumb: Thumb): string | null => {
     return this._delegate.getInputEl(thumb).getAttribute(attribute);
