@@ -248,16 +248,16 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, OnD
   getWindow() {
     return this._document.defaultView || window;
   }
-  getThumb(thumb: Thumb): MatSliderThumbDecorator {
+  getThumb(thumb: Thumb = Thumb.END): MatSliderThumbDecorator {
     return thumb === Thumb.END ? this.thumbs[this.thumbs.length - 1] : this.thumbs[0];
   }
-  getThumbEl(thumb: Thumb): HTMLElement {
+  getThumbEl(thumb: Thumb = Thumb.END): HTMLElement {
     return this.getThumb(thumb).getRootEl();
   }
-  getInput(thumb: Thumb): MatSliderThumb {
+  getInput(thumb: Thumb = Thumb.END): MatSliderThumb {
     return thumb === Thumb.END ? this.inputs[this.inputs.length - 1] : this.inputs[0];
   }
-  getInputEl(thumb: Thumb): HTMLInputElement {
+  getInputEl(thumb: Thumb = Thumb.END): HTMLInputElement {
     return this.getInput(thumb).getRootEl();
   }
 
