@@ -53,14 +53,14 @@ export class MatSliderEvent {
   source: MatSlider;
 
   /** The MatSliderThumb that changed. */
-  thumb: MatSliderThumb;
+  sliderThumb: MatSliderThumb;
 
   /** The new value of the source slider. */
   value: number | null;
 
-  constructor(source: MatSlider, thumb: MatSliderThumb, value: number | null) {
+  constructor(source: MatSlider, sliderThumb: MatSliderThumb, value: number | null) {
     this.source = source;
-    this.thumb = thumb;
+    this.sliderThumb = sliderThumb;
     this.value = value;
   }
 }
@@ -229,6 +229,9 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, OnD
     return tickMark === TickMark.ACTIVE
       ? 'mdc-slider__tick-mark--active'
       : 'mdc-slider__tick-mark--inactive';
+  }
+  isInputFocused(thumb: Thumb = Thumb.END) {
+    return this.getInputEl(thumb) === this.getDocument().activeElement;
   }
   emitChangeEvent(value: number, thumb: Thumb) {
     this.change.emit(this._createEvent(value, thumb));
@@ -405,7 +408,7 @@ class SliderAdapter implements MDCSliderAdapter {
     this._delegate.getInputEl(thumb).focus();
   }
   isInputFocused = (thumb: Thumb): boolean => {
-    return this._delegate.getInputEl(thumb) === this._delegate.getDocument().activeElement;
+    return this._delegate.isInputFocused(thumb);
   }
   getThumbKnobWidth = (thumb: Thumb): number => {
     return this._delegate.getThumb(thumb).getKnobWidth();
@@ -443,7 +446,7 @@ class SliderAdapter implements MDCSliderAdapter {
     this._delegate.tickMarks = tickMarks;
   }
   setPointerCapture = (pointerId: number): void => {
-    this._delegate.getRootEl().setPointerCapture(pointerId);
+      this._delegate.getRootEl().setPointerCapture(pointerId);
   }
   emitChangeEvent = (value: number, thumb: Thumb): void => {
     this._delegate.emitChangeEvent(value, thumb);

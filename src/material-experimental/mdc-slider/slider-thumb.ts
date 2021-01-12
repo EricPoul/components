@@ -7,7 +7,7 @@
  */
 
 import {coerceNumberProperty, NumberInput} from '@angular/cdk/coercion';
-import {ChangeDetectorRef, Directive, ElementRef, Input} from '@angular/core';
+import {ChangeDetectorRef, Directive, ElementRef, EventEmitter, HostListener, Input, Output} from '@angular/core';
 import {Thumb} from '@material/slider';
 import {MatSlider} from './slider';
 
@@ -74,6 +74,8 @@ import {MatSlider} from './slider';
   @Input()
   set disabled(v: boolean) { throw Error('Invalid attribute "disabled" on MatSliderThumb.'); }
 
+  @Output() focus: EventEmitter<void> = new EventEmitter<void>();
+  @Output() blur: EventEmitter<void> = new EventEmitter<void>();
 
   /** Indicates which slider thumb this input corresponds to. */
   thumb: Thumb;
@@ -96,6 +98,14 @@ import {MatSlider} from './slider';
   }
 
   getRootEl(): HTMLInputElement { return this._el.nativeElement; };
+
+  @HostListener('focusin') onFocusIn(): void {
+    this.focus.emit();
+  }
+
+  @HostListener('focusout') onFocusOut(): void {
+    this.blur.emit();
+  }
 
   static ngAcceptInputType_value: NumberInput;
 }
