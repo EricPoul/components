@@ -9,7 +9,6 @@
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatSliderModule} from '@angular/material-experimental/mdc-slider';
-import {MatTabsModule} from '@angular/material-experimental/mdc-tabs';
 import {RouterModule} from '@angular/router';
 import {MdcSliderDemo} from './mdc-slider-demo';
 
@@ -17,7 +16,6 @@ import {MdcSliderDemo} from './mdc-slider-demo';
   imports: [
     FormsModule,
     MatSliderModule,
-    MatTabsModule,
     RouterModule.forChild([{path: '', component: MdcSliderDemo}]),
   ],
   declarations: [MdcSliderDemo],
