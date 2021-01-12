@@ -31,10 +31,21 @@ import {
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
+import {CanColorCtor, mixinColor} from '@angular/material/core';
 import {SpecificEventListener, EventType} from '@material/base';
 import {MDCSliderAdapter, MDCSliderFoundation, Thumb, TickMark} from '@material/slider';
 import {MatSliderThumb} from './slider-thumb';
 import {MatSliderThumbDecorator} from './slider-thumb-decorator';
+
+// Boilerplate for applying mixins to MatSlider.
+/** @docs-private */
+class MatSliderBase {
+  constructor(public _elementRef: ElementRef<HTMLElement>) {}
+}
+const _MatSliderMixinBase:
+    CanColorCtor &
+    typeof MatSliderBase =
+        mixinColor(MatSliderBase, 'primary');
 
 /** A simple event emitted by the MatSlider component. */
 export class MatSliderEvent {
@@ -54,6 +65,8 @@ export class MatSliderEvent {
   }
 }
 
+// TODO(wagnermaciel): Figure out what the MAT_SLIDER_VALUE_ACCESSOR did and add it back.
+
 /**
  * Allows users to select from a range of values by moving the slider thumb. It is similar in
  * behavior to the native `<input type="range">` element.
@@ -63,7 +76,7 @@ export class MatSliderEvent {
   templateUrl: 'slider.html',
   styleUrls: ['slider.css'],
   host: {
-    'class': 'mdc-slider',
+    'class': 'mat-mdc-slider mdc-slider',
     '[class.mdc-slider--range]': 'isRange',
     '[class.mdc-slider--disabled]': 'isDisabled',
     '[class.mdc-slider--discrete]': 'isDiscrete',
@@ -73,8 +86,9 @@ export class MatSliderEvent {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [],
+  inputs: ['color'],
 })
-export class MatSlider implements AfterViewInit, OnDestroy {
+export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, OnDestroy {
 
   // ************************* //
   // View and content children //
@@ -272,11 +286,13 @@ export class MatSlider implements AfterViewInit, OnDestroy {
   }
 
   constructor(
-    private _cdr: ChangeDetectorRef,
-    private _elementRef: ElementRef<HTMLElement>,
-    private _platform: Platform,
-    @Inject(DOCUMENT) private _document: any,
-  ) {}
+    protected _cdr: ChangeDetectorRef,
+    public _elementRef: ElementRef<HTMLElement>,
+    protected _platform: Platform,
+    @Inject(DOCUMENT) protected _document: any,
+  ) {
+    super(_elementRef);
+  }
 
   ngAfterViewInit() {
     this.initialized = true;
@@ -297,7 +313,7 @@ export class MatSlider implements AfterViewInit, OnDestroy {
   // more intuitive & less strict syntax for using the mat-slider. For example, without this the
   // following would be invalid:
   //
-  // <mat-slider step="10"isDisabled>
+  // <mat-slider step="10" isDisabled>
   //   <input mat-slider-thumb>
   // </mat-slider>
   //
@@ -374,6 +390,7 @@ class SliderAdapter implements MDCSliderAdapter {
   }
   isRTL = (): boolean => {
     return false;
+    // TODO(wagnermaciel): DO NOT FORGET TO IMPLEMENT THIS.
     // throw new Error('Method not implemented.');
   }
   setThumbStyleProperty = (propertyName: string, value: string, thumb: Thumb): void => {
