@@ -446,7 +446,11 @@ class SliderAdapter implements MDCSliderAdapter {
     this._delegate.tickMarks = tickMarks;
   }
   setPointerCapture = (pointerId: number): void => {
+    try {
       this._delegate.getRootEl().setPointerCapture(pointerId);
+    } catch (error) {
+      console.warn(error);
+    }
   }
   emitChangeEvent = (value: number, thumb: Thumb): void => {
     this._delegate.emitChangeEvent(value, thumb);
